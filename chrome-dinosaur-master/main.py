@@ -6,13 +6,10 @@ from mouth_detector import mouth_detector
 
 pygame.init()
 
-# --- Global Settings ---
 SCREEN_HEIGHT = 600
 SCREEN_WIDTH = 1100
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-# --- Load Assets ---
-# Зургийг дэлгэцийн хэмжээнд тохируулна
 BACKGROUND_IMAGE = pygame.image.load(os.path.join("Assets/Other", "Background.png"))
 BACKGROUND_IMAGE = pygame.transform.scale(BACKGROUND_IMAGE, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
@@ -20,17 +17,16 @@ RUNNING = [pygame.image.load(os.path.join("Assets/Dino", "DinoRun1.png")),
            pygame.image.load(os.path.join("Assets/Dino", "DinoRun2.png"))]
 JUMPING = pygame.image.load(os.path.join("Assets/Dino", "DinoJump.png"))
 
-SMALL_CACTUS = [pygame.image.load(os.path.join("Assets/Cactus", "SmallCactus1.png")),
+JIJIG_SAAD = [pygame.image.load(os.path.join("Assets/Cactus", "SmallCactus1.png")),
                 pygame.image.load(os.path.join("Assets/Cactus", "SmallCactus2.png")),
                 pygame.image.load(os.path.join("Assets/Cactus", "SmallCactus3.png"))]
-LARGE_CACTUS = [pygame.image.load(os.path.join("Assets/Cactus", "LargeCactus1.png")),
+TOM_SAAD = [pygame.image.load(os.path.join("Assets/Cactus", "LargeCactus1.png")),
                 pygame.image.load(os.path.join("Assets/Cactus", "LargeCactus2.png")),
                 pygame.image.load(os.path.join("Assets/Cactus", "LargeCactus3.png"))]
 CLOUD = pygame.image.load(os.path.join("Assets/Other", "Cloud.png"))
 BG = pygame.image.load(os.path.join("Assets/Other", "Track.png"))
 
-# --- Dino Class ---
-class Dinosaur:
+class Baatar:
     X_POS = 80
     Y_POS = 450
     Y_POS_DUCK = 480
@@ -158,7 +154,7 @@ def main(is_mouth_open):
     global game_speed, x_pos_bg, y_pos_bg, points, obstacles
     run = True
     clock = pygame.time.Clock()
-    player = Dinosaur()
+    player = Baatar()
     cloud = Cloud()
     game_speed = 20
     x_pos_bg = 0
@@ -200,9 +196,9 @@ def main(is_mouth_open):
         if len(obstacles) == 0:
             rand = random.randint(0, 2)
             if rand == 0:
-                obstacles.append(SmallCactus(SMALL_CACTUS))
+                obstacles.append(SmallCactus(JIJIG_SAAD))
             elif rand == 1:
-                obstacles.append(LargeCactus(LARGE_CACTUS))
+                obstacles.append(LargeCactus(TOM_SAAD))
 
         for obstacle in obstacles:
             obstacle.draw(SCREEN)
