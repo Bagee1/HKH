@@ -55,7 +55,7 @@ def mouth_detector(is_mouth_open, threshold=0.08):
                         is_open = ratio > threshold
 
                         color = (0, 255, 0) if is_open else (0, 0, 255)
-                        cv2.putText(frame, f"Mouth {'Open' if is_open else 'Closed'}", 
+                        cv2.putText(frame, f" {'Open' if is_open else 'Closed'}", 
                                     (30, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2)
 
                 is_mouth_open.value = 1 if is_open else 0
