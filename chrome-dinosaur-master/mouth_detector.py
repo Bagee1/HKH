@@ -1,4 +1,3 @@
-# Refactored mouth_detector.py with improvements discussed
 
 import cv2
 import mediapipe as mp

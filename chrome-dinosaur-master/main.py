@@ -12,11 +12,13 @@ SCREEN_WIDTH = 1100
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # --- Load Assets ---
+# Зургийг дэлгэцийн хэмжээнд тохируулна
+BACKGROUND_IMAGE = pygame.image.load(os.path.join("Assets/Other", "Background.png"))
+BACKGROUND_IMAGE = pygame.transform.scale(BACKGROUND_IMAGE, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
 RUNNING = [pygame.image.load(os.path.join("Assets/Dino", "DinoRun1.png")),
            pygame.image.load(os.path.join("Assets/Dino", "DinoRun2.png"))]
 JUMPING = pygame.image.load(os.path.join("Assets/Dino", "DinoJump.png"))
-DUCKING = [pygame.image.load(os.path.join("Assets/Dino", "DinoDuck1.png")),
-           pygame.image.load(os.path.join("Assets/Dino", "DinoDuck2.png"))]
 
 SMALL_CACTUS = [pygame.image.load(os.path.join("Assets/Cactus", "SmallCactus1.png")),
                 pygame.image.load(os.path.join("Assets/Cactus", "SmallCactus2.png")),
@@ -24,22 +26,17 @@ SMALL_CACTUS = [pygame.image.load(os.path.join("Assets/Cactus", "SmallCactus1.pn
 LARGE_CACTUS = [pygame.image.load(os.path.join("Assets/Cactus", "LargeCactus1.png")),
                 pygame.image.load(os.path.join("Assets/Cactus", "LargeCactus2.png")),
                 pygame.image.load(os.path.join("Assets/Cactus", "LargeCactus3.png"))]
-
-BIRD = [pygame.image.load(os.path.join("Assets/Bird", "Bird1.png")),
-        pygame.image.load(os.path.join("Assets/Bird", "Bird2.png"))]
-
 CLOUD = pygame.image.load(os.path.join("Assets/Other", "Cloud.png"))
 BG = pygame.image.load(os.path.join("Assets/Other", "Track.png"))
 
 # --- Dino Class ---
 class Dinosaur:
     X_POS = 80
-    Y_POS = 310
-    Y_POS_DUCK = 340
+    Y_POS = 450
+    Y_POS_DUCK = 480
     JUMP_VEL = 8.5
 
     def __init__(self):
-        self.duck_img = DUCKING
         self.run_img = RUNNING
         self.jump_img = JUMPING
         self.dino_duck = False
@@ -51,6 +48,7 @@ class Dinosaur:
         self.dino_rect = self.image.get_rect()
         self.dino_rect.x = self.X_POS
         self.dino_rect.y = self.Y_POS
+        self.mouth_opened_once = False
 
     def update(self, userInput, mouth_open):
         if self.dino_duck:
@@ -62,6 +60,15 @@ class Dinosaur:
 
         if self.step_index >= 10:
             self.step_index = 0
+            
+        if mouth_open and not self.mouth_opened_once and not self.dino_jump:
+            self.dino_duck = False
+            self.dino_run = False
+            self.dino_jump = True
+            self.mouth_opened_once = True  
+        elif not mouth_open:
+            self.mouth_opened_once = False 
+        
 
         if (userInput[pygame.K_UP] or mouth_open) and not self.dino_jump:
             self.dino_duck = False
@@ -76,12 +83,6 @@ class Dinosaur:
             self.dino_run = True
             self.dino_jump = False
 
-    def duck(self):
-        self.image = self.duck_img[self.step_index // 5]
-        self.dino_rect = self.image.get_rect()
-        self.dino_rect.x = self.X_POS
-        self.dino_rect.y = self.Y_POS_DUCK
-        self.step_index += 1
 
     def run(self):
         self.image = self.run_img[self.step_index // 5]
@@ -103,12 +104,6 @@ class Dinosaur:
         screen.blit(self.image, (self.dino_rect.x, self.dino_rect.y))
 
 
-# --- Obstacle and Cloud Classes (хэвээр) ---
-# --- Cloud, Obstacle, SmallCactus, LargeCactus, Bird (code таныхтай ижил) ---
-
-# Товчлох үүднээс энд үлдээе. Хэрвээ хүсвэл бүрэн нэмэж өгнө.
-
-# --- Main Game Loop ---
 
 class Cloud:
     def __init__(self):
@@ -147,31 +142,19 @@ class SmallCactus(Obstacle):
     def __init__(self, image):
         self.type = random.randint(0, 2)
         super().__init__(image, self.type)
-        self.rect.y = 325
+        self.rect.y = 465
 
 
 class LargeCactus(Obstacle):
     def __init__(self, image):
         self.type = random.randint(0, 2)
         super().__init__(image, self.type)
-        self.rect.y = 300
+        self.rect.y = 440
 
-
-class Bird(Obstacle):
-    def __init__(self, image):
-        self.type = 0
-        super().__init__(image, self.type)
-        self.rect.y = 250
-        self.index = 0
-
-    def draw(self, SCREEN):
-        if self.index >= 9:
-            self.index = 0
-        SCREEN.blit(self.image[self.index//5], self.rect)
-        self.index += 1
 
 
 def main(is_mouth_open):
+    
     global game_speed, x_pos_bg, y_pos_bg, points, obstacles
     run = True
     clock = pygame.time.Clock()
@@ -179,7 +162,7 @@ def main(is_mouth_open):
     cloud = Cloud()
     game_speed = 20
     x_pos_bg = 0
-    y_pos_bg = 380
+    y_pos_bg = 530
     points = 0
     font = pygame.font.Font('freesansbold.ttf', 20)
     obstacles = []
@@ -190,7 +173,7 @@ def main(is_mouth_open):
         points += 1
         if points % 100 == 0:
             game_speed += 1
-        text = font.render("Points: " + str(points), True, (0, 0, 0))
+        text = font.render("" + str(points), True, (0, 0, 0))
         SCREEN.blit(text, (950, 40))
 
     def background():
@@ -207,12 +190,13 @@ def main(is_mouth_open):
             if event.type == pygame.QUIT:
                 run = False
 
-        SCREEN.fill((255, 255, 255))
+        SCREEN.blit(BACKGROUND_IMAGE, (0, 0))
         userInput = pygame.key.get_pressed()
 
         player.draw(SCREEN)
+        
         player.update(userInput, is_mouth_open.value)
-
+        
         if len(obstacles) == 0:
             rand = random.randint(0, 2)
             if rand == 0:
@@ -232,7 +216,7 @@ def main(is_mouth_open):
         cloud.draw(SCREEN)
         cloud.update()
         score()
-        clock.tick(30)
+        clock.tick(30) 
         pygame.display.update()
 
 
@@ -249,7 +233,7 @@ def menu(death_count, is_mouth_open):
             text = font.render("Press any Key to Start", True, (0, 0, 0))
         else:
             text = font.render("Press any Key to Restart", True, (0, 0, 0))
-            score_text = font.render("Your Score: " + str(points), True, (0, 0, 0))
+            score_text = font.render("Оноо: " + str(points), True, (0, 0, 0))
             SCREEN.blit(score_text, (SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2 + 50))
 
         SCREEN.blit(text, (SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2))

@@ -1,0 +1,4 @@
+multiprocessing
+cv2
+import pygame
+mediapipe
